@@ -49,6 +49,19 @@ MIDDLEWARE = {
 }
 ```
 
+4. Install required dependencies:
+
+```
+# Add to requirements.txt in easy mcp root folder
+
+google-auth-oauthlib==1.2.1
+cryptography==44.0.2
+google-api-python-client==2.166.0
+
+# Run installer
+pip install -r requirements.txt
+```
+
 ## Usage
 
 Refer to the database file for usage
