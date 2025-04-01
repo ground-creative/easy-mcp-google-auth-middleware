@@ -7,7 +7,9 @@ This is a google authentication service middleware for easy mcp python.
 1. Donwload middlewares from the root folder of the easy mcp installation:
 
 ```
-wget
+mkdir app/middleware/google
+wget -P app/middleware/google https://raw.githubusercontent.com/ground-creative/easy-mcp-google-auth-middleware/refs/heads/main/GoogleAuthMiddleware.py
+wget -P app/middleware/google https://raw.githubusercontent.com/ground-creative/easy-mcp-google-auth-middleware/refs/heads/main/database.py
 ```
 
 2. Create create a utility to attach credentials to global variables:
