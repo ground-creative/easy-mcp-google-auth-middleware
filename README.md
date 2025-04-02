@@ -1,6 +1,7 @@
 # Google Auth Middleware For Easy MCP Server
 
-This is a google authentication service middleware for easy mcp python.
+This is a google authentication service middleware for easy mcp python.<br>
+The middleware uses sqlite to storage encrypted credentials data.
 
 ## Installation
 
@@ -37,7 +38,7 @@ def attach_google_services(credentials):
     )  # Save Sheets service to global state
 ```
 
-3. Create file app/config/app.py if it does not exists and add the the middleware:
+3. Create file app/config/app.py if it does not exists and add the middleware:
 
 ```
 MIDDLEWARE = {
@@ -45,7 +46,14 @@ MIDDLEWARE = {
         {
             "middleware": "app.middleware.google.GoogleAuthMiddleware",
             "priority": 1,
-            "args": {"auth_callback": "app.utils.credentials.attach_google_services"},
+            "args": {
+                "auth_callback": lambda: getattr(
+                    importlib.import_module(
+                        "app.utils.credentials.attach_google_services".rsplit(".", 1)[0]
+                    ),
+                    "app.utils.credentials.attach_google_services".rsplit(".", 1)[-1],
+                )
+            },
         }
     ]
 }
@@ -64,6 +72,45 @@ google-api-python-client==2.166.0
 pip install -r requirements.txt
 ```
 
-## Usage
+5. Generate encryption key:
+
+```
+python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+```
+
+6. Add env variables to .env file:
+
+```
+DB_PATH=storage/sqlite_credentials.db
+CYPHER=Your Encryption Key Here
+```
+
+## Verifying Authentication
+
+Use the class method `check_access` to check if user is authenticated:
+
+```
+# app/tools/add.py
+
+from utils.application.logger import logger # Use to add logging capabilities
+from mcp.server.fastmcp import Context      # Use `ctx: Context` as function param to get mcp context
+from core.utils.state import global_state   # Use to add and read global vars
+from core.utils.logger import logger        # Use to import the logger instance
+from app.middleware.google.GoogleAuthMiddleware import check_access
+
+def add_numbers_tool(a: int, b: int) -> int:
+    """Add two numbers"""
+
+    # Check authentication
+    auth_response = check_access(True)    # Set to true to return the global error message set by the middleware
+    if auth_response:
+        return auth_response
+
+    return a + b
+
+
+```
+
+## Database Usage
 
 Refer to the database file for usage
