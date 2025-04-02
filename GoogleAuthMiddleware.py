@@ -127,22 +127,22 @@ class GoogleAuthMiddleware(BaseHTTPMiddleware):
             )
             return await call_next(request)  # Proceed without authentication
 
-    @classmethod
-    def check_access(returnJsonOnError=False):
 
-        if not global_state.get("is_authenticated"):
-            logger.error("User is not authenticated.")
+def check_access(returnJsonOnError=False):
 
-            if returnJsonOnError:
-                return json.dumps(
-                    {
-                        "status": "error",
-                        "error": global_state.get(
-                            "error_message", "User is not authenticated."
-                        ),
-                    }
-                )
+    if not global_state.get("is_authenticated"):
+        logger.error("User is not authenticated.")
 
-            return "User is not authenticated."
+        if returnJsonOnError:
+            return json.dumps(
+                {
+                    "status": "error",
+                    "error": global_state.get(
+                        "error_message", "User is not authenticated."
+                    ),
+                }
+            )
 
-        return None  # Return None if authenticated
+        return "User is not authenticated."
+
+    return None  # Return None if authenticated
