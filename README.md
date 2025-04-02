@@ -62,14 +62,7 @@ MIDDLEWARE = {
 4. Install required dependencies:
 
 ```
-# Add to requirements.txt in easy mcp root folder
-
-google-auth-oauthlib==1.2.1
-cryptography==44.0.2
-google-api-python-client==2.166.0
-
-# Run installer
-pip install -r requirements.txt
+pip install google-auth-oauthlib cryptography google-api-python-client
 ```
 
 5. Generate encryption key:
