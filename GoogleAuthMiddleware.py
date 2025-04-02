@@ -112,7 +112,7 @@ class GoogleAuthMiddleware(BaseHTTPMiddleware):
                     return await call_next(request)  # Proceed without authentication
 
             # Attach services to request state
-            self.auth_callback(creds)
+            self.auth_callback()(creds)
 
             global_state.set("is_authenticated", True, True)
             response = await call_next(request)
@@ -122,7 +122,27 @@ class GoogleAuthMiddleware(BaseHTTPMiddleware):
             logger.error(f"Authentication failed: {str(e)}")
             global_state.set(
                 "error_message",
-                f"There has been an error with authenticating, please go to {EnvConfig.get('APP_HOST')}/auth/login and  to authenticate",
+                f"There has been an error with authenticating, please go to {EnvConfig.get('APP_HOST')}/auth/login to authenticate",
                 True,
             )
             return await call_next(request)  # Proceed without authentication
+
+    @classmethod
+    def check_access(returnJsonOnError=False):
+
+        if not global_state.get("is_authenticated"):
+            logger.error("User is not authenticated.")
+
+            if returnJsonOnError:
+                return json.dumps(
+                    {
+                        "status": "error",
+                        "error": global_state.get(
+                            "error_message", "User is not authenticated."
+                        ),
+                    }
+                )
+
+            return "User is not authenticated."
+
+        return None  # Return None if authenticated
